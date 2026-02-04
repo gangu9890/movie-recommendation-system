@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Recommender</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #000000, #0d1b2a);
+            color: white;
+        }
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+        .left-panel {
+            width: 30%;
+            background-color: #1a1a2e;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 10px #000;
+            margin-right: 40px;
+            position: relative;
+        }
+        .left-panel input, .left-panel button {
+            width: 95%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .left-panel input {
+            background: #eaeaea;
+        }
+        .left-panel button {
+            background-color: #0f3460;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 101%;
+        }
+        .left-panel button:hover {
+            background-color: #1a5ca4;
+        }
+        #suggestions {
+            background: white;
+            color: black;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            width: calc(100% - 60px);
+            z-index: 10;
+            margin-top: 5px;
+            border-radius: 5px;
+        }
+        .suggestion {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .suggestion:hover {
+            background-color: #f0f0f0;
+        }
+        .right-panel {
+            width: 70%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            align-items: start;
+        }
+        .movie {
+            background-color: #16213e;
+            border-radius: 15px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 0 8px #000;
+        }
+        .movie img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .movie p {
+            margin-top: 6px;
+            font-size: 14px;
+            color: #dcdcdc;
+        }
+        .movie p strong {
+            font-size: 16px;
+            color: #ffffff;
+        }
+    </style>
+
+    <script>
+        let titles = [];
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/titles/')
+                .then(response => response.json())
+                .then(data => { titles = data; });
+            const input = document.getElementById('movie-input');
+            const suggestions = document.getElementById('suggestions');
+            input.addEventListener('input', () => {
+                const value = input.value.toLowerCase();
+                suggestions.innerHTML = '';
+                if (value.length === 0) return;
+                const filtered = titles.filter(title => title.toLowerCase().includes(value)).slice(0, 5);
+                filtered.forEach(title => {
+                    const option = document.createElement('div');
+                    option.textContent = title;
+                    option.classList.add('suggestion');
+                    option.onclick = () => {
+                        input.value = title;
+                        suggestions.innerHTML = '';
+                    };
+                    suggestions.appendChild(option);
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="left-panel">
+            <h2>Movie Recommender</h2>
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+                <input type="text" name="movie" id="movie-input" placeholder="e.g. Avatar">
+                <div id="suggestions"></div>
+                <button type="submit">Recommend</button>
+            </form>
+            {% if input_movie and input_poster %}
+                <div style="margin-top: 30px; text-align: center;">
+                    <h3 style="margin-bottom: 10px;">Selected Movie</h3>
+                    <img src="{{ input_poster }}" alt="{{ input_movie }} poster" style="width: 40%; border-radius: 10px; box-shadow: 0 0 8px #000;">
+                    <p style="margin-top: 10px; color: #ccc;">{{ input_movie }}</p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="right-panel">
+            {% if recommendations %}
+                {% for movie, poster, year, rating in recommendations %}
+                <div class="movie">
+                    <img src="{{ poster }}" alt="{{ movie }} poster">
+                    <p><strong>{{ movie }}</strong></p>
+                    <p>Year: {{ year }}</p>
+                    <p>Rating: {{ rating }}/10</p>
+                </div>
+                {% endfor %}
+            {% elif recommendations is not none %}
+                <p>No recommendations found.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
