@@ -15,10 +15,12 @@ warnings.filterwarnings("ignore", category=UserWarning)
 lemmatizer = WordNetLemmatizer()
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-# nltk.download('punkt')
-# nltk.download('wordnet')
-# nltk.download('averaged_perceptron_tagger')
-# nltk.download('omw-1.4')
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('averaged_perceptron_tagger_eng')
+nltk.download('omw-1.4')
+nltk.download('punkt_tab')
 
 def convert(obj):
     return [i['name'] for i in ast.literal_eval(obj)]
@@ -49,8 +51,8 @@ def lemmatize_text(text):
     return " ".join([lemmatizer.lemmatize(word, get_wordnet_pos(pos)) for word, pos in tagged])
 
 # Load data
-movies = pd.read_csv("data/tmdb_5000_movies.csv")
-credits = pd.read_csv("data/tmdb_5000_credits.csv")
+movies = pd.read_csv("tmdb_5000_movies.csv")
+credits = pd.read_csv("tmdb_5000_credits.csv")
 
 movies = movies.merge(credits, on='title')
 movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew', 'release_date', 'vote_average']]

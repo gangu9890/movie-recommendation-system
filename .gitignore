@@ -1,0 +1,21 @@
+# Virtual environment
+venv/
+demo/myenv/
+env/
+.env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data and Artifacts (Large files)
+artifacts/
+nltk_data/
+*.csv
+*.pkl
+*.npy
+
+# OS specific files
+.DS_Store
+Thumbs.db
