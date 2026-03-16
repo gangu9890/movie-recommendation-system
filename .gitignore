@@ -10,11 +10,11 @@ __pycache__/
 *$py.class
 
 # Data and Artifacts (Large files)
-artifacts/
+# artifacts/
 nltk_data/
 *.csv
-*.pkl
-*.npy
+# *.pkl
+# *.npy
 
 # OS specific files
 .DS_Store
